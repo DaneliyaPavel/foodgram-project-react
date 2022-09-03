@@ -21,8 +21,12 @@ def pdf_shopping_list_generator(user):
     response['Content-Disposition'] = (
         'attachment; filename="shopping_list.pdf"'
     )
-    pdfmetrics.registerFont(TTFont('OpenSans-Light', 'media/fonts/opensansr.ttf'))
-    pdfmetrics.registerFont(TTFont('OpenSans-Regular', 'media/fonts/opensansl.ttf'))
+    pdfmetrics.registerFont(TTFont(
+        'OpenSans-Light', 'media/fonts/opensansr.ttf'
+    ))
+    pdfmetrics.registerFont(TTFont(
+        'OpenSans-Regular', 'media/fonts/opensansl.ttf'
+    ))
     page = Canvas(filename=response)
     page.setFont('OpenSans-Regular', 24)
     page.drawString(210, 800, 'Список покупок')

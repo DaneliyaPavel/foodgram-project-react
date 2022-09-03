@@ -163,7 +163,7 @@ class IngredientInRecipe(TimeStampedModel):
         return f'{self.recipe}: {self.ingredient} – {self.amount}'
 
 
-class Favorite(models.Model):
+class Favorite(TimeStampedModel):
     """
     Модель избранных рецептов у пользователя.
     """
@@ -193,7 +193,7 @@ class Favorite(models.Model):
         return f'Рецепт {self.recipe} в избранном пользователя {self.user}'
 
 
-class Cart(models.Model):
+class Cart(TimeStampedModel):
     """
     Модель списка покупок пользователя.
     """

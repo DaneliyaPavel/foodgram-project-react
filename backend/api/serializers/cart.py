@@ -1,28 +1,40 @@
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ValidationError
 from rest_framework import serializers
 
 from api.serializers.users import RecipeSubscriptionSerializer
-from recipes.models import Cart, Recipe
+from recipes.models import Cart
 
 User = get_user_model()
 
 
 class CartSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор для добавления/удаления
+    рецептов в корзину.
+    """
+
     class Meta:
         model = Cart
         fields = ('user', 'recipe')
 
     def validate(self, data):
-        if Cart.objects.filter(
-                user=self.context['request'].user,
-                recipe=data['recipe']
-        ):
-            raise serializers.ValidationError('Уже добавлен')
+        request = self.context.get('request')
+        recipe_id = data['recipe'].id
+        cart_exists = Cart.objects.filter(
+            user=request.user,
+            recipe__id=recipe_id
+        ).exists()
+
+        if request.method == 'GET' and cart_exists:
+            raise serializers.ValidationError(
+                'Рецепт уже в списке покупок!'
+            )
+
         return data
 
     def to_representation(self, instance):
+        request = self.context.get('request')
+        context = {'request': request}
         return RecipeSubscriptionSerializer(
             instance.recipe,
-            context={'request': self.context.get('request')}
-        ).data
+            context=context).data
