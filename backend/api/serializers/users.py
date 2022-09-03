@@ -59,8 +59,11 @@ class CustomUserSerializer(UserSerializer):
 
     class Meta(UserSerializer.Meta):
         fields = (
-            'id', 'username', 'email',
-            'first_name', 'last_name',
+            'id',
+            'username',
+            'email',
+            'first_name',
+            'last_name',
             'is_subscribed'
         )
         read_only_fields = 'is_subscribed',
@@ -85,8 +88,17 @@ class RecipeSubscriptionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Recipe
-        fields = ('id', 'name', 'image', 'cooking_time')
-        read_only_fields = ('name', 'image', 'cooking_time')
+        fields = (
+            'id',
+            'name',
+            'image',
+            'cooking_time'
+        )
+        read_only_fields = (
+            'name',
+            'image',
+            'cooking_time'
+        )
 
 
 class SubscriptionsListSerializer(serializers.ModelSerializer):

@@ -29,12 +29,22 @@ class RecipeListSerializer(serializers.ModelSerializer):
         model = Recipe
         depth = 1
         fields = (
-            'id', 'tags', 'author', 'ingredients', 'is_favorited',
-            'is_in_shopping_cart', 'name', 'image',
-            'text', 'cooking_time',
+            'id',
+            'tags',
+            'author',
+            'ingredients',
+            'is_favorited',
+            'is_in_shopping_cart',
+            'name',
+            'image',
+            'text',
+            'cooking_time',
         )
 
     def get_is_favorited(self, obj):
+        """
+        Проверка на вхождение в список избранного.
+        """
         request = self.context.get('request')
         if request is None or request.user.is_anonymous:
             return False
@@ -42,6 +52,9 @@ class RecipeListSerializer(serializers.ModelSerializer):
                                        recipe=obj).exists()
 
     def get_is_in_shopping_cart(self, obj):
+        """
+        Проверка на вхождение в корзину.
+        """
         request = self.context.get('request')
         if request is None or request.user.is_anonymous:
             return False
@@ -91,7 +104,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('Добавьте тег')
         recipe = Recipe.objects.create(**validated_data)
         recipe.tags.set(tags)
-        ingredients_list = [
+        ingredient_list = [
             IngredientInRecipe(
                 recipe=recipe,
                 ingredient=ingredient.get('id'),
@@ -99,7 +112,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             )
             for ingredient in ingredients
         ]
-        IngredientInRecipe.objects.bulk_create(ingredients_list)
+        IngredientInRecipe.objects.bulk_create(ingredient_list)
         return recipe
 
     @transaction.atomic
@@ -111,7 +124,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             instance.tags.set(tags)
         if ingredients:
             instance.ingredients.clear()
-            ingredients_list = [
+            ingredient_list = [
                 IngredientInRecipe(
                     recipe=instance,
                     ingredient=ingredient.get('id'),
@@ -119,7 +132,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
                 )
                 for ingredient in ingredients
             ]
-            IngredientInRecipe.objects.bulk_create(ingredients_list)
+            IngredientInRecipe.objects.bulk_create(ingredient_list)
         return instance
 
     def validate(self, data):
