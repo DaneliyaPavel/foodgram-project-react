@@ -25,7 +25,7 @@ class FavoriteSerializer(serializers.ModelSerializer):
             recipe__id=recipe_id
         ).exists()
 
-        if request.method == 'GET' and favorite_exists:
+        if request.method == 'POST' and favorite_exists:
             raise serializers.ValidationError(
                 'Рецепт уже в избранном!'
             )

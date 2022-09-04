@@ -94,76 +94,92 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             'cooking_time'
         )
 
+    @staticmethod
+    def create_ingredients_tags(recipe, ingredients, tags):
+        for tag in tags:
+            recipe.tags.add(tag)
+            recipe.save()
+        for ingredient in ingredients:
+            ingredient_list = [
+                IngredientInRecipe(
+                    recipe=recipe,
+                    ingredient=ingredient.get('id'),
+                    amount=ingredient.get('amount')
+                )]
+            IngredientInRecipe.objects.bulk_create(ingredient_list)
+
     @transaction.atomic
     def create(self, validated_data):
         ingredients = validated_data.pop('ingredients', None)
         tags = validated_data.pop('tags', None)
-        if not ingredients:
-            raise serializers.ValidationError('Добавьте ингредиент')
-        elif not tags:
-            raise serializers.ValidationError('Добавьте тег')
         recipe = Recipe.objects.create(**validated_data)
-        recipe.tags.set(tags)
-        ingredient_list = [
-            IngredientInRecipe(
-                recipe=recipe,
-                ingredient=ingredient.get('id'),
-                amount=ingredient.get('amount')
-            )
-            for ingredient in ingredients
-        ]
-        IngredientInRecipe.objects.bulk_create(ingredient_list)
+        self.create_ingredients_tags(
+            recipe, ingredients, tags
+        )
         return recipe
 
     @transaction.atomic
     def update(self, instance, validated_data):
-        ingredients = validated_data.pop('ingredients', None)
-        tags = validated_data.pop('tags', None)
-        instance = super().update(instance, validated_data)
-        if tags:
-            instance.tags.set(tags)
-        if ingredients:
-            instance.ingredients.clear()
-            ingredient_list = [
-                IngredientInRecipe(
-                    recipe=instance,
-                    ingredient=ingredient.get('id'),
-                    amount=ingredient.get('amount')
-                )
-                for ingredient in ingredients
-            ]
-            IngredientInRecipe.objects.bulk_create(ingredient_list)
-        return instance
+        instance.tags.clear()
+        IngredientInRecipe.objects.filter(recipe=instance).delete()
+        ingredients = validated_data.pop('ingredients')
+        tags = validated_data.pop('tags')
+        self.create_ingredients_tags(
+            instance, ingredients, tags
+        )
+        return super().update(instance, validated_data)
 
     def validate(self, data):
         ingredient_data = self.initial_data.get('ingredients')
         name = data.get('name')
-        if ingredient_data:
-            checked_ingredients = set()
-            for ingredient in ingredient_data:
-                ingredient_obj = get_object_or_404(
-                    Ingredient, id=ingredient['id']
+        tags = data.get('tags')
+        cooking_time = data.get('cooking_time')
+        if not ingredient_data:
+            raise serializers.ValidationError(
+                'Добавьте ингредиент!'
+            )
+        checked_ingredients = set()
+        for ingredient in ingredient_data:
+            ingredient_obj = get_object_or_404(
+                Ingredient, id=ingredient['id']
+            )
+            amount = data.get('ingredients')
+            if [item for item in amount if item['amount'] < 1]:
+                raise serializers.ValidationError(
+                    'Убедитесь, что значение больше либо равно 1.'
                 )
-                amount = data.get('ingredients')
-                if [item for item in amount if item['amount'] < 1]:
-                    raise serializers.ValidationError({
-                        'amount':
-                            'Убедитесь, что значение больше либо равно 1.'
-                    })
-                if ingredient_obj in checked_ingredients:
-                    raise serializers.ValidationError('дубликат ингредиента')
-                checked_ingredients.add(ingredient_obj)
-                cooking_time = data.get('cooking_time')
-                if cooking_time < 1:
-                    raise serializers.ValidationError({
-                        'cooking_time':
-                            'Убедитесь, что значение больше либо равно 1.'
-                    })
-                if len(name) > 200:
-                    raise serializers.ValidationError({
-                        'name':
-                            'Название рецепта не должно превышать 200 символов'
-                    })
+            if ingredient_obj in checked_ingredients:
+                raise serializers.ValidationError(
+                    'Ингредиенты не должны повторяться!'
+                )
+            checked_ingredients.add(ingredient_obj)
+        if cooking_time < 1:
+            raise serializers.ValidationError(
+                'Убедитесь, что значение больше либо равно 1!'
+            )
+        if len(name) > 200:
+            raise serializers.ValidationError(
+                'Название рецепта не должно превышать 200 символов!'
+            )
+        if not tags:
+            raise serializers.ValidationError(
+                'Добавьте тег!'
+            )
+        checked_tags = set()
+        for tag in tags:
+            if tag in checked_tags:
+                raise serializers.ValidationError(
+                    'Теги должны быть уникальными!'
+                )
+            checked_tags.add(tag)
+        return data
+
+    def validate_tags(self, data):
+        tags_data = self.initial_data.get('tags')
+        if not tags_data:
+            raise serializers.ValidationError(
+                'Добавьте тег'
+            )
         return data
 
     def to_representation(self, recipe):

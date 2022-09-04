@@ -11,8 +11,14 @@ from .models import (
 
 
 class RecipeIngredientInline(admin.TabularInline):
-    model = Recipe.ingredients.through
+    model = IngredientInRecipe
+    min_num = 1
     extra = 1
+
+
+class RecipeTagInLine(admin.TabularInline):
+    model = Recipe.tags.through
+    extra = 0
 
 
 @admin.register(Recipe)
@@ -21,23 +27,31 @@ class RecipeAdmin(admin.ModelAdmin):
         'pk',
         'author',
         'name',
+        'image',
         'text',
-        "image",
-        'cooking_time',
-        'created',
         'favorites_count',
+        'created',
     )
-    search_fields = ('name',)
+    search_fields = (
+        'name',
+        'author__username',
+        'tags__name',
+    )
     ordering = ('-created',)
-    inline = (RecipeIngredientInline,)
+    inlines = (RecipeIngredientInline, RecipeTagInLine,)
     readonly_fields = ('favorites_count', 'created')
-    list_filter = ('name', 'author', 'tags', 'created',)
+    list_filter = (
+        'name',
+        'author',
+        'tags',
+        'created',
+    )
     empty_value_display = '-пусто-'
 
     def favorites_count(self, obj):
         return obj.favorites_recipe.all().count()
 
-    favorites_count.short_description = 'Количество рецептов в избранном'
+    favorites_count.short_description = 'Добавлений в избранное'
 
 
 @admin.register(Ingredient)

@@ -25,7 +25,7 @@ class CartSerializer(serializers.ModelSerializer):
             recipe__id=recipe_id
         ).exists()
 
-        if request.method == 'GET' and cart_exists:
+        if request.method == 'POST' and cart_exists:
             raise serializers.ValidationError(
                 'Рецепт уже в списке покупок!'
             )
