@@ -82,7 +82,6 @@ jobs:
             sudo docker-compose exec -T backend python manage.py load_ingredients
             sudo docker-compose exec -T backend python manage.py load_tags
             sudo docker-compose exec -T backend python manage.py collectstatic --no-input
-            sudo docker exec backend python manage.py createsuperuser --email pavel@daneli.ya --username pavel --password foodgramproject --first_name Павел --last_name Данелия --no-input
 
 
   send_message:
