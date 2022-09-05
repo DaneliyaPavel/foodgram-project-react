@@ -103,15 +103,16 @@ cd backend/
 pip install -r requirements.txt
 ```
 
+* Выставьте в файле settings.py ``DEBUG = True``, для работы локально 
+на sqlite3,
+или ``DEBUG = False`` для работы с БД PostgeSQL
+
 * Выполните миграции:
 
 ```bash
 python manage.py makemigrations
 python manage.py migrate
 ```
-
-* Выставьте в файле settings.py ``DEBUG = True``, для работы локально на sqlite3,
-или ``DEBUG = False`` для работы с БД PostgeSQL
 
 * Запустите сервер:
 ```bash
@@ -223,7 +224,7 @@ nano .env
     TELEGRAM_TO=<ID чата, в который придет сообщение>
     TELEGRAM_TOKEN=<токен вашего бота>
     ```
-    Workflow состоит из трёх шагов:
+    Workflow состоит из 4 шагов:
      - Проверка кода на соответствие PEP8
      - Сборка и публикация образа бекенда на DockerHub.
      - Автоматический деплой на удаленный сервер.
