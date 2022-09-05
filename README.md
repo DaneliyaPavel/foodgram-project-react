@@ -172,7 +172,7 @@ sudo apt upgrade -y
 Скопируйте подготовленные файлы `docker-compose.yml` и `nginx.conf` из вашего проекта на сервер:
 ```
 scp docker-compose.yaml <username>@<host>/home/<username>/docker-compose.yaml
-scp nginx.conf <username>@<host>/home/<username>/nginx/default.conf
+scp nginx.conf <username>@<host>/home/<username>/nginx.conf
 ```
 Установите Docker и Docker-compose:
 ```
@@ -199,9 +199,9 @@ nano .env
 или создайте этот файл локально и скопируйте файл по аналогии с предыдущим шагом. Как создать и заполнять
 указано в разделе запуска проекта в Docker контейнере.
 
-### После успешного деплоя:
-Выполните все шаги по аналогии с "Запуск проекта в Docker контейнере", начиная с шага
-**"Запустите docker compose"**
+> После успешного деплоя выполните все шаги по аналогии с разделом
+> **"Запуск проекта в Docker контейнере"**, начиная с шага
+> **"Запустите docker compose"**
 
 * Для работы с Workflow добавьте в Secrets GitHub переменные окружения для работы:
     ```
