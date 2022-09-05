@@ -1,4 +1,4 @@
-name: foodgram-project-react
+name: foodgram_project
 
 on:
   push:
