@@ -230,6 +230,11 @@ nano .env
      - Автоматический деплой на удаленный сервер.
      - Отправка уведомления в телеграм-чат.  
 
+##Админка для ревьюера
+```
+email: pavel@daneli.ya
+password: Zxcvasd12
+```
 ## Workflow
 
 Main branch status
