@@ -144,9 +144,9 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
                 Ingredient, id=ingredient['id']
             )
             amount = data.get('ingredients')
-            if [item for item in amount if item['amount'] < 1]:
+            if [item for item in amount if item['amount'] <= 0]:
                 raise serializers.ValidationError(
-                    'Убедитесь, что значение больше либо равно 1.'
+                    'Количество ингредиентов должно быть больше 0!'
                 )
             if ingredient_obj in checked_ingredients:
                 raise serializers.ValidationError(
@@ -155,7 +155,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             checked_ingredients.add(ingredient_obj)
         if cooking_time < 1:
             raise serializers.ValidationError(
-                'Убедитесь, что значение больше либо равно 1!'
+                'Убедитесь, что время приготовления больше либо равно 1!'
             )
         if len(name) > 200:
             raise serializers.ValidationError(
