@@ -236,9 +236,6 @@ nano .env
 email: pavel@daneli.ya
 password: Zxcvasd12
 ```
-## Workflow
-
-Main branch status
 
 
 
